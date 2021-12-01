@@ -17,6 +17,10 @@ inputs:
     description: 'Configuration for migrations'
     required: true
     default: true
+  HOT_RELEASE:
+    descrition: 'Perform a hot upgrade when deploying'
+    required: false
+    default: false
 
 runs:
   using: 'node12'

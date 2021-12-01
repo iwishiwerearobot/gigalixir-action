@@ -69,6 +69,10 @@ async function getCurrentRelease(app) {
   return currentRelease;
 }
 
+function performHotRelease(hotRelease) {
+  return (hotRelease === "true") ? ` -c http.extraheader="GIGALIXIR-HOT: true" ` : ""
+}
+
 async function run() {
   try {
     const gigalixirUsername = core.getInput('GIGALIXIR_USERNAME', { required: true });
@@ -76,6 +80,7 @@ async function run() {
     const sshPrivateKey = core.getInput('SSH_PRIVATE_KEY', { required: true });
     const gigalixirApp = core.getInput('GIGALIXIR_APP', { required: true });
     const migrations = core.getInput('MIGRATIONS', { required: true });
+    const hotrelease = core.getInput('HOT_RELEASE', {required: false});
 
     await core.group("Installing gigalixir", async () => {
       await exec.exec('sudo pip install gigalixir --ignore-installed six')
@@ -95,7 +100,7 @@ async function run() {
     core.info(`The current release is ${currentRelease}`);
 
     await core.group("Deploying to gigalixir", async () => {
-      await exec.exec("git push -f gigalixir HEAD:refs/heads/master");
+      await exec.exec("git ${performHotRelease(hotRelease)} push -f gigalixir HEAD:refs/heads/master");
     });
 
     if (migrations === "true") {
